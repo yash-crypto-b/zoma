@@ -41,7 +41,10 @@ export function securityBoundary(req, res, next) {
     if (!['GET','HEAD','OPTIONS'].includes(req.method)) {
       const origin = req.get('origin');
       const expected = process.env.SITE_URL || `${req.protocol}://${req.get('host')}`;
-      if (req.get('sec-fetch-site') === 'cross-site' || (origin && origin !== expected)) return res.status(403).json({ success: false, message: 'cross-site request blocked' });
+      // Vercel proxies same-origin API requests to this service. Only its
+      // explicitly configured production origin may also send cookie mutations.
+      const allowedOrigins = [expected, process.env.FRONTEND_ORIGIN].filter(Boolean);
+      if (req.get('sec-fetch-site') === 'cross-site' || (origin && !allowedOrigins.includes(origin))) return res.status(403).json({ success: false, message: 'cross-site request blocked' });
       // Browser cookie mutations must carry JSON or video, forcing a CORS preflight.
       if (!req.is('application/json') && !req.is('video/mp4')) return res.status(415).json({ success: false, message: 'unsupported content type' });
     }

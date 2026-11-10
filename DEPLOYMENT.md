@@ -10,6 +10,12 @@ Free instances sleep when idle, uploaded files are ephemeral, and free Render Po
 
 ## Docker host deployment
 
+### Separate Vercel frontend
+
+The root `vercel.json` builds the public pages and app into `dist` with `node scripts/build-frontend.mjs`. It proxies `/api`, `/uploads`, and `/health` to the Render backend, preserving same-origin cookie authentication. Configure Render's `FRONTEND_ORIGIN` to the Vercel project's exact production HTTPS origin. Unrelated origins and cross-site mutation requests remain blocked. Preview deployment origins are intentionally not authorized for cookie mutations.
+
+Vercel's `VERCEL_PROJECT_PRODUCTION_URL` supplies the frontend's canonical origin at build time; `SITE_URL` can override it for a custom domain. No database credentials or signing secrets belong in the frontend project.
+
 This app serves its frontend and API together; there is no frontend build step. The included deployment targets one Linux Docker host, with Caddy terminating HTTPS, a persistent uploads volume, and an external PostgreSQL database with certificate-verified TLS. Docker Compose v2 is required. Keep one app instance: uploads and request throttling are local to that instance.
 
 ## Configure

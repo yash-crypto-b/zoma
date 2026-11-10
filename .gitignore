@@ -12,3 +12,7 @@ server/uploads/
 # Local tooling and generated test output
 .freebuff/
 **/*results.txt
+dist/
+.vercel/
+
+.vercel

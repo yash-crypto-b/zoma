@@ -1,0 +1,9 @@
+.git
+.freebuff
+**/node_modules
+**/.env
+**/.env.*
+**/*results.txt
+server/uploads
+dist
+.vercel
