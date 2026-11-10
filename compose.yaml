@@ -1,0 +1,49 @@
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    init: true
+    env_file: .env.production
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 3000
+      TRUSTED_PROXIES: 172.30.0.2/32
+    volumes:
+      - uploads:/app/server/uploads
+    networks:
+      web:
+        ipv4_address: 172.30.0.3
+    stop_grace_period: 30s
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+  proxy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    environment:
+      APP_DOMAIN: ${APP_DOMAIN:?Set APP_DOMAIN in .env.production}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      app:
+        condition: service_healthy
+    networks:
+      web:
+        ipv4_address: 172.30.0.2
+volumes:
+  uploads:
+  caddy_data:
+  caddy_config:
+networks:
+  web:
+    ipam:
+      config:
+        - subnet: 172.30.0.0/24

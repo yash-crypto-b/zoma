@@ -1,0 +1,14 @@
+# Dependencies and local secrets
+node_modules/
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.log
+*.pem
+*.key
+server/uploads/
+
+# Local tooling and generated test output
+.freebuff/
+**/*results.txt
