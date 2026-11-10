@@ -3,7 +3,7 @@ ENV NODE_ENV=production HOST=0.0.0.0 PORT=3000
 WORKDIR /app/server
 COPY server/package.json server/package-lock.json server/.npmrc ./
 RUN npm ci --omit=dev && npm cache clean --force
-COPY --chown=node:node server/server.js ./
+COPY --chown=node:node server/server.js server/render-start.js ./
 COPY --chown=node:node server/src ./src
 COPY --chown=node:node client /app/client
 RUN mkdir -p /app/server/uploads && chown node:node /app/server/uploads

@@ -1,5 +1,15 @@
 # Deploy Zomareel
 
+## Render free test deployment
+
+Use the repository's Dockerfile with no root directory, and override the Docker command with `node render-start.js`. This entry point runs the existing schema migration in a child process and starts the server only after it succeeds. On the free test deployment, `DATABASE_URL` must use the new test database's schema-owner login; paid production deployments should use the separate migration and runtime credentials described below.
+
+Set `NODE_ENV=production`, `HOST=0.0.0.0`, `SITE_URL` to the service's exact public HTTPS origin, a generated `JWT_SECRET`, `DB_SSL=true`, and `DATABASE_URL` to the Render PostgreSQL external connection URL without SSL query parameters. External connections retain certificate-verified TLS. Set `TRUSTED_PROXIES=loopback,linklocal,uniquelocal` for Render's internal proxy and configure `/health` as the health check path. Verify HTTPS pages and database-backed API requests after deployment.
+
+Free instances sleep when idle, uploaded files are ephemeral, and free Render PostgreSQL expires after 30 days. This setup is for testing with a fresh database; it does not copy local accounts or uploaded videos.
+
+## Docker host deployment
+
 This app serves its frontend and API together; there is no frontend build step. The included deployment targets one Linux Docker host, with Caddy terminating HTTPS, a persistent uploads volume, and an external PostgreSQL database with certificate-verified TLS. Docker Compose v2 is required. Keep one app instance: uploads and request throttling are local to that instance.
 
 ## Configure
